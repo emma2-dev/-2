@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.CommentMapper">
+    
+    <resultMap id="BaseResultMap" type="com.blog.entity.Comment">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="type" property="type"/>
+        <result column="target_id" property="targetId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="reply_user_id" property="replyUserId"/>
+        <result column="content" property="content"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_avatar" property="userAvatar"/>
+        <result column="reply_user_name" property="replyUserName"/>
+    </resultMap>
+    
+    <insert id="insert" parameterType="com.blog.entity.Comment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comment (user_id, type, target_id, parent_id, reply_user_id, content, like_count, status)
+        VALUES (#{userId}, #{type}, #{targetId}, #{parentId}, #{replyUserId}, #{content}, #{likeCount}, #{status})
+    </insert>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT c.*, u.nickname as user_name, u.avatar as user_avatar,
+               ru.nickname as reply_user_name
+        FROM comment c
+        LEFT JOIN user u ON c.user_id = u.id
+        LEFT JOIN user ru ON c.reply_user_id = ru.id
+        WHERE c.id = #{id}
+    </select>
+    
+    <delete id="deleteById">
+        DELETE FROM comment WHERE id = #{id}
+    </delete>
+    
+    <select id="selectByTarget" resultMap="BaseResultMap">
+        SELECT c.*, u.nickname as user_name, u.avatar as user_avatar,
+               ru.nickname as reply_user_name
+        FROM comment c
+        LEFT JOIN user u ON c.user_id = u.id
+        LEFT JOIN user ru ON c.reply_user_id = ru.id
+        WHERE c.type = #{type} AND c.target_id = #{targetId} AND c.status = 1
+        ORDER BY c.create_time DESC
+    </select>
+    
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT c.*, u.nickname as user_name, u.avatar as user_avatar,
+               ru.nickname as reply_user_name
+        FROM comment c
+        LEFT JOIN user u ON c.user_id = u.id
+        LEFT JOIN user ru ON c.reply_user_id = ru.id
+        <where>
+            c.status = 1
+            <if test="type != null">AND c.type = #{type}</if>
+            <if test="targetId != null">AND c.target_id = #{targetId}</if>
+        </where>
+        ORDER BY c.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countComments" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM comment
+        <where>
+            status = 1
+            <if test="type != null">AND type = #{type}</if>
+            <if test="targetId != null">AND target_id = #{targetId}</if>
+        </where>
+    </select>
+    
+    <update id="increaseLikeCount">
+        UPDATE comment SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+    
+</mapper>
+
+

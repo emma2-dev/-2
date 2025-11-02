@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.NoteMapper">
+    
+    <resultMap id="BaseResultMap" type="com.blog.entity.Note">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="content" property="content"/>
+        <result column="images" property="images"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="author_name" property="authorName"/>
+        <result column="author_avatar" property="authorAvatar"/>
+    </resultMap>
+    
+    <insert id="insert" parameterType="com.blog.entity.Note" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO note (user_id, content, images, like_count, comment_count, status)
+        VALUES (#{userId}, #{content}, #{images}, #{likeCount}, #{commentCount}, #{status})
+    </insert>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT n.*, u.nickname as author_name, u.avatar as author_avatar
+        FROM note n
+        LEFT JOIN user u ON n.user_id = u.id
+        WHERE n.id = #{id}
+    </select>
+    
+    <update id="update" parameterType="com.blog.entity.Note">
+        UPDATE note
+        <set>
+            <if test="content != null">content = #{content},</if>
+            <if test="images != null">images = #{images},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM note WHERE id = #{id}
+    </delete>
+    
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT n.*, u.nickname as author_name, u.avatar as author_avatar
+        FROM note n
+        LEFT JOIN user u ON n.user_id = u.id
+        <where>
+            n.status = 1
+            <if test="userId != null">AND n.user_id = #{userId}</if>
+        </where>
+        ORDER BY n.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countNotes" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM note
+        <where>
+            status = 1
+            <if test="userId != null">AND user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <update id="increaseLikeCount">
+        UPDATE note SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+    
+</mapper>
+
+

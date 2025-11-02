@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.CategoryMapper">
+    
+    <resultMap id="BaseResultMap" type="com.blog.entity.Category">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    
+    <insert id="insert" parameterType="com.blog.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO category (name, description, sort, status)
+        VALUES (#{name}, #{description}, #{sort}, #{status})
+    </insert>
+    
+    <select id="selectById" resultType="com.blog.entity.Category">
+        SELECT * FROM category WHERE id = #{id}
+    </select>
+    
+    <update id="update" parameterType="com.blog.entity.Category">
+        UPDATE category
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM category WHERE id = #{id}
+    </delete>
+    
+    <select id="selectAll" resultType="com.blog.entity.Category">
+        SELECT * FROM category WHERE status = 1 ORDER BY sort ASC
+    </select>
+    
+    <select id="selectByName" resultType="com.blog.entity.Category">
+        SELECT * FROM category WHERE name = #{name}
+    </select>
+    
+    <select id="selectHotCategories" resultType="com.blog.entity.Category">
+        SELECT c.*, COUNT(a.id) as article_count
+        FROM category c
+        LEFT JOIN article a ON c.id = a.category_id AND a.status = 2
+        WHERE c.status = 1
+        GROUP BY c.id
+        ORDER BY article_count DESC, c.sort ASC
+        LIMIT #{limit}
+    </select>
+    
+</mapper>
+
+

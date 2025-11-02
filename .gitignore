@@ -1,0 +1,53 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Log
+*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Node.js
+blog-frontend/node_modules/
+blog-frontend/dist/
+blog-frontend/.DS_Store
+blog-frontend/npm-debug.log*
+blog-frontend/yarn-debug.log*
+blog-frontend/yarn-error.log*
+
+# Upload files
+blog-files/
+
+
