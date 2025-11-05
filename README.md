@@ -33,14 +33,15 @@
 
 ### 管理员功能
 - ✅ 控制台（数据统计）
-- ✅ 文章管理（新建、编辑、删除、发布）
-- ✅ 随笔管理
-- ✅ 分类管理
-- ✅ 标签管理
-- ✅ 留言管理
-- ✅ 评论管理
-- ✅ 文件管理（上传、删除）
-- ✅ 用户管理
+- ✅ 文章管理（新建、编辑、删除、发布、审核）
+- ✅ 随笔管理（查看、删除）
+- ✅ 分类管理（新增、编辑、删除）
+- ✅ 标签管理（新增、编辑、删除）
+- ✅ 轮播图管理（新增、编辑、删除、启用/禁用）
+- ✅ 留言管理（查看、删除）
+- ✅ 评论管理（查看、删除）
+- ✅ 文件管理（上传、删除、查看）
+- ✅ 用户管理（查看、删除）
 
 ## 项目结构
 
@@ -76,9 +77,9 @@
 
 ### 1. 数据库准备
 
-1. 创建MySQL数据库
+1. 创建MySQL数据库（数据库名：personal_blog）
 2. 执行 `database/schema.sql` 脚本创建数据表
-3. 默认管理员账号：admin，密码：admin123
+3. 默认管理员账号：admin，密码：admin123（首次运行后会自动创建）
 
 ### 2. 后端启动
 
@@ -149,12 +150,14 @@ npm run serve
 - PUT /api/category - 更新分类
 - DELETE /api/category/{id} - 删除分类
 - GET /api/category/list - 分类列表
+- GET /api/category/hot - 热门分类
 
 ### 标签接口
 - POST /api/tag - 创建标签
 - PUT /api/tag - 更新标签
 - DELETE /api/tag/{id} - 删除标签
 - GET /api/tag/list - 标签列表
+- GET /api/tag/hot - 热门标签
 
 ### 随笔接口
 - POST /api/note - 创建随笔
@@ -179,6 +182,18 @@ npm run serve
 - POST /api/file/upload - 上传文件
 - DELETE /api/file/{id} - 删除文件
 - GET /api/file/list - 文件列表
+- GET /api/file/image/{filename} - 访问图片
+- GET /api/file/download/{filename} - 下载文件
+
+### 轮播图接口
+- POST /api/carousel - 创建轮播图（管理员）
+- PUT /api/carousel - 更新轮播图（管理员）
+- DELETE /api/carousel/{id} - 删除轮播图（管理员）
+- GET /api/carousel/list - 获取展示的轮播图列表（公开）
+- GET /api/carousel/all - 获取所有轮播图（管理员）
+
+### 统计接口
+- GET /api/statistics - 获取系统统计数据（管理员）
 
 ## 配置说明
 
@@ -203,16 +218,21 @@ jwt:
 ```yaml
 file:
   upload-path: D:/blog-files/         # 文件上传路径
+  access-path: /files/**              # 文件访问路径映射
 ```
 
 ## 项目特点
 
-1. **前后端分离**：后端提供RESTful API，前端使用Vue构建
-2. **权限控制**：基于JWT的身份认证，拦截器实现权限控制
-3. **代码规范**：采用三层架构（Controller-Service-Mapper）
-4. **响应式设计**：Element UI组件库，美观的用户界面
-5. **Markdown编辑器**：支持Markdown格式编写文章
-6. **文件管理**：支持图片等文件的上传和管理
+1. **前后端分离**：后端提供RESTful API，前端使用Vue构建，接口统一返回Result格式
+2. **权限控制**：基于JWT的身份认证，拦截器实现权限控制，支持用户和管理员角色
+3. **代码规范**：采用三层架构（Controller-Service-Mapper），代码结构清晰
+4. **响应式设计**：Element UI组件库，美观的用户界面，良好的用户体验
+5. **Markdown编辑器**：集成Mavon Editor，支持Markdown格式编写文章，实时预览
+6. **文件管理**：支持图片等文件的上传和管理，可配置文件存储路径
+7. **轮播图管理**：支持首页轮播图配置，可启用/禁用
+8. **数据统计**：管理员后台提供系统数据统计功能
+9. **评论系统**：支持文章、随笔、留言的评论和点赞功能
+10. **分类标签**：支持文章分类和标签管理，便于内容组织
 
 ## 开发环境
 
@@ -224,11 +244,14 @@ file:
 
 ## 注意事项
 
-1. 首次运行前需要执行数据库脚本创建表结构
-2. 确保MySQL服务已启动
-3. 修改配置文件中的数据库连接信息
-4. 文件上传路径需要手动创建或修改为实际路径
-5. 前端代理配置在 `vue.config.js` 中，默认代理到 http://localhost:8080
+1. **数据库配置**：首次运行前需要执行数据库脚本创建表结构，确保MySQL服务已启动
+2. **配置文件修改**：修改 `application.yml` 中的数据库连接信息（用户名、密码、数据库名）
+3. **文件存储路径**：文件上传路径需要手动创建目录，或修改 `application.yml` 中的 `file.upload-path` 为实际路径
+4. **前端代理配置**：前端代理配置在 `vue.config.js` 中，默认代理到 http://localhost:8080/api
+5. **JWT密钥**：生产环境请修改 `application.yml` 中的 JWT 密钥，确保安全性
+6. **端口冲突**：如8080或8081端口被占用，请修改对应配置文件中的端口号
+7. **跨域问题**：后端已配置CORS跨域支持，前端开发时无需担心跨域问题
+8. **管理员账号**：首次登录后请及时修改默认管理员密码
 
 ## 后续优化建议
 
